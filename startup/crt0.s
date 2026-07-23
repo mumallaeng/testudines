@@ -365,9 +365,9 @@ __start:
 	STRLO	r2, [r3], #4
 	BLO		3b
 
-	.extern Main
+	.extern testudines
 
-	BL		Main
+	BL		testudines
 
 	B		.
 			
