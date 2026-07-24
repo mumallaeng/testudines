@@ -9,6 +9,5 @@
 #define SERVO_ANGLE_MAX_DEG 180U
 
 void Servo_ApplyInitialPose(void);
-int Servo_SetAngle(ArmServoId servo, uint16_t angle_deg);
 
 #endif /* SERVO_H */
