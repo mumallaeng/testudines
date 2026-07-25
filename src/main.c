@@ -1,14 +1,9 @@
 #include "stm32f4xx.h"
 #include "servo.h"
 #include "servo_pwm.h"
+#include "uart2.h"
 
 #define USER_LED_PIN 5U
-
-static void Delay(volatile uint32_t count)
-{
-    while (count-- != 0U)
-        ;
-}
 
 void _Invalid_ISR(void) // startup vector table의 exception(interrupt) 기본 처리
 {
@@ -24,11 +19,13 @@ void testudines(void)
     GPIOA->MODER |= GPIO_MODER_MODER5_0;
 
     ServoPwm_InitAll();
+    Uart2_Init();
     Servo_ApplyInitialPose();
 
     while (1)
     {
+        uint8_t key = Uart2_ReceiveByte();
+        Servo_HandleCalibrationKey(key);
         GPIOA->ODR ^= (1U << USER_LED_PIN);
-        Delay(800000U);
     }
 }

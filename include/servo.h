@@ -9,5 +9,6 @@
 #define SERVO_ANGLE_MAX_DEG 180U
 
 void Servo_ApplyInitialPose(void);
+void Servo_HandleCalibrationKey(uint8_t key);
 
 #endif /* SERVO_H */

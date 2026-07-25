@@ -22,8 +22,7 @@ void Uart2_Init(void)
 void Uart2_SendByte(uint8_t byte)
 {
     while ((USART2->SR & USART_SR_TXE) == 0U)
-    {
-    }
+        ;
 
     USART2->DR = byte;
 }
@@ -31,8 +30,7 @@ void Uart2_SendByte(uint8_t byte)
 uint8_t Uart2_ReceiveByte(void)
 {
     while ((USART2->SR & USART_SR_RXNE) == 0U)
-    {
-    }
+        ;
 
     return (uint8_t)USART2->DR;
 }
