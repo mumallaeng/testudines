@@ -22,6 +22,10 @@ void testudines(void)
     Uart2_Init();
     Servo_ApplyInitialPose();
 
+    Uart2_SendString("Servo key console\r\n");
+    Uart2_SendString("q/a BS  w/s SH  e/d EL\r\n");
+    Uart2_SendString("r/f WP  t/g WY  y/h GR\r\n");
+
     while (1)
     {
         uint8_t key = Uart2_ReceiveByte();

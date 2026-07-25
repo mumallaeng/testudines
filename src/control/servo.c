@@ -24,22 +24,20 @@ typedef struct
 /* Calibration table: 0일 땐 PWM 출력 비활성화 */
 static const ServoCalibration g_servo_calibration[ARM_SERVO_COUNT] =
     {
-        [ARM_SERVO_LOWER_1] = {0U, SERVO_NEUTRAL_US, 0U, SERVO_NEUTRAL_US, SERVO_DIRECTION_UNVERIFIED},
-        [ARM_SERVO_LOWER_2] = {0U, SERVO_NEUTRAL_US, 0U, 800U, SERVO_DIRECTION_UNVERIFIED},
-        [ARM_SERVO_LOWER_3] = {0U, SERVO_NEUTRAL_US, 0U, 800U, SERVO_DIRECTION_UNVERIFIED},
-        // [ARM_SERVO_LOWER_3] = {0U, SERVO_NEUTRAL_US, 0U, 350U, SERVO_DIRECTION_UNVERIFIED},
-        [ARM_SERVO_UPPER_1] = {0U, SERVO_NEUTRAL_US, 0U, 1000U, SERVO_DIRECTION_UNVERIFIED},
-        // [ARM_SERVO_UPPER_2] = {0U, SERVO_NEUTRAL_US, 0U, 1500U, SERVO_DIRECTION_UNVERIFIED},
-        [ARM_SERVO_UPPER_2] = {0U, SERVO_NEUTRAL_US, 0U, 100U, SERVO_DIRECTION_UNVERIFIED},
-        [ARM_SERVO_GRIPPER] = {0U, SERVO_NEUTRAL_US, 0U, 100U, SERVO_DIRECTION_UNVERIFIED}};
+        [ARM_SERVO_BASE] = {0U, SERVO_NEUTRAL_US, 0U, SERVO_NEUTRAL_US, SERVO_DIRECTION_UNVERIFIED},
+        [ARM_SERVO_SHOULDER] = {0U, SERVO_NEUTRAL_US, 0U, 660U, SERVO_DIRECTION_UNVERIFIED},
+        [ARM_SERVO_ELBOW] = {0U, SERVO_NEUTRAL_US, 0U, 900U, SERVO_DIRECTION_UNVERIFIED},
+        [ARM_SERVO_WRIST_PITCH] = {0U, SERVO_NEUTRAL_US, 0U, 1100U, SERVO_DIRECTION_UNVERIFIED},
+        [ARM_SERVO_WRIST_YAW] = {360U, SERVO_NEUTRAL_US, 2620U, 2300U, SERVO_DIRECTION_UNVERIFIED},
+        [ARM_SERVO_GRIPPER] = {400U, SERVO_NEUTRAL_US, 1000U, 400U, SERVO_DIRECTION_UNVERIFIED}};
 
 static const char *const kServoName[ARM_SERVO_COUNT] =
     {
-        [ARM_SERVO_LOWER_1] = "L1",
-        [ARM_SERVO_LOWER_2] = "L2",
-        [ARM_SERVO_LOWER_3] = "L3",
-        [ARM_SERVO_UPPER_1] = "U1",
-        [ARM_SERVO_UPPER_2] = "U2",
+        [ARM_SERVO_BASE] = "BS",
+        [ARM_SERVO_SHOULDER] = "SH",
+        [ARM_SERVO_ELBOW] = "EL",
+        [ARM_SERVO_WRIST_PITCH] = "WP",
+        [ARM_SERVO_WRIST_YAW] = "WY",
         [ARM_SERVO_GRIPPER] = "GR"};
 
 static uint16_t g_current_pulse_us[ARM_SERVO_COUNT];
@@ -69,7 +67,7 @@ void Servo_ApplyInitialPose(void)
 {
     ArmServoId servo;
 
-    for (servo = ARM_SERVO_LOWER_1; servo < ARM_SERVO_COUNT; servo++)
+    for (servo = ARM_SERVO_BASE; servo < ARM_SERVO_COUNT; servo++)
     {
         if (g_servo_calibration[servo].initial_us == 0U)
         {
@@ -93,43 +91,43 @@ void Servo_HandleCalibrationKey(uint8_t key)
     switch (key)
     {
     case 'q':
-        servo = ARM_SERVO_LOWER_1;
+        servo = ARM_SERVO_BASE;
         delta_us = (int16_t)SERVO_PULSE_STEP_US;
         break;
     case 'a':
-        servo = ARM_SERVO_LOWER_1;
+        servo = ARM_SERVO_BASE;
         delta_us = -(int16_t)SERVO_PULSE_STEP_US;
         break;
     case 'w':
-        servo = ARM_SERVO_LOWER_2;
+        servo = ARM_SERVO_SHOULDER;
         delta_us = (int16_t)SERVO_PULSE_STEP_US;
         break;
     case 's':
-        servo = ARM_SERVO_LOWER_2;
+        servo = ARM_SERVO_SHOULDER;
         delta_us = -(int16_t)SERVO_PULSE_STEP_US;
         break;
     case 'e':
-        servo = ARM_SERVO_LOWER_3;
+        servo = ARM_SERVO_ELBOW;
         delta_us = (int16_t)SERVO_PULSE_STEP_US;
         break;
     case 'd':
-        servo = ARM_SERVO_LOWER_3;
+        servo = ARM_SERVO_ELBOW;
         delta_us = -(int16_t)SERVO_PULSE_STEP_US;
         break;
     case 'r':
-        servo = ARM_SERVO_UPPER_1;
+        servo = ARM_SERVO_WRIST_PITCH;
         delta_us = (int16_t)SERVO_PULSE_STEP_US;
         break;
     case 'f':
-        servo = ARM_SERVO_UPPER_1;
+        servo = ARM_SERVO_WRIST_PITCH;
         delta_us = -(int16_t)SERVO_PULSE_STEP_US;
         break;
     case 't':
-        servo = ARM_SERVO_UPPER_2;
+        servo = ARM_SERVO_WRIST_YAW;
         delta_us = (int16_t)SERVO_PULSE_STEP_US;
         break;
     case 'g':
-        servo = ARM_SERVO_UPPER_2;
+        servo = ARM_SERVO_WRIST_YAW;
         delta_us = -(int16_t)SERVO_PULSE_STEP_US;
         break;
     case 'y':

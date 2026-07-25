@@ -47,7 +47,7 @@ void ServoPwm_InitAll(void)
     GPIOA->MODER |= GPIO_MODER_MODER9_1;
 
     GPIOB->AFR[0] &= ~(GPIO_AFRL_AFSEL3_Msk | GPIO_AFRL_AFSEL4_Msk | GPIO_AFRL_AFSEL6_Msk);
-    GPIOB->AFR[0] |= GPIO_AFRL_AFSEL3_1 | GPIO_AFRL_AFSEL4_1 | GPIO_AFRL_AFSEL6_0;
+    GPIOB->AFR[0] |= GPIO_AFRL_AFSEL3_0 | GPIO_AFRL_AFSEL4_1 | GPIO_AFRL_AFSEL6_1; // PB3=AF1(TIM2_CH2), PB6=AF2(TIM4_CH1)
     GPIOB->AFR[1] &= ~GPIO_AFRH_AFSEL10_Msk;
     GPIOB->AFR[1] |= GPIO_AFRH_AFSEL10_0;
     GPIOC->AFR[0] &= ~GPIO_AFRL_AFSEL7_Msk;
@@ -101,27 +101,27 @@ void ServoPwm_SetPulseUs(ArmServoId servo, uint16_t pulse_us)
 
     switch (servo)
     {
-    case ARM_SERVO_LOWER_1:
+    case ARM_SERVO_BASE:
         TIM4->CCR1 = safe_pulse_us;
         TIM4->EGR = TIM_EGR_UG;
         TIM4->CCER |= TIM_CCER_CC1E;
         break;
-    case ARM_SERVO_LOWER_2:
+    case ARM_SERVO_SHOULDER:
         TIM3->CCR2 = safe_pulse_us;
         TIM3->EGR = TIM_EGR_UG;
         TIM3->CCER |= TIM_CCER_CC2E;
         break;
-    case ARM_SERVO_LOWER_3:
+    case ARM_SERVO_ELBOW:
         TIM1->CCR2 = safe_pulse_us;
         TIM1->EGR = TIM_EGR_UG;
         TIM1->CCER |= TIM_CCER_CC2E;
         break;
-    case ARM_SERVO_UPPER_1:
+    case ARM_SERVO_WRIST_PITCH:
         TIM2->CCR3 = safe_pulse_us;
         TIM2->EGR = TIM_EGR_UG;
         TIM2->CCER |= TIM_CCER_CC3E;
         break;
-    case ARM_SERVO_UPPER_2:
+    case ARM_SERVO_WRIST_YAW:
         TIM3->CCR1 = safe_pulse_us;
         TIM3->EGR = TIM_EGR_UG;
         TIM3->CCER |= TIM_CCER_CC1E;
@@ -140,19 +140,19 @@ void ServoPwm_DisableOutput(ArmServoId servo)
 {
     switch (servo)
     {
-    case ARM_SERVO_LOWER_1:
+    case ARM_SERVO_BASE:
         TIM4->CCER &= ~TIM_CCER_CC1E;
         break;
-    case ARM_SERVO_LOWER_2:
+    case ARM_SERVO_SHOULDER:
         TIM3->CCER &= ~TIM_CCER_CC2E;
         break;
-    case ARM_SERVO_LOWER_3:
+    case ARM_SERVO_ELBOW:
         TIM1->CCER &= ~TIM_CCER_CC2E;
         break;
-    case ARM_SERVO_UPPER_1:
+    case ARM_SERVO_WRIST_PITCH:
         TIM2->CCER &= ~TIM_CCER_CC3E;
         break;
-    case ARM_SERVO_UPPER_2:
+    case ARM_SERVO_WRIST_YAW:
         TIM3->CCER &= ~TIM_CCER_CC1E;
         break;
     case ARM_SERVO_GRIPPER:
