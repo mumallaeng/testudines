@@ -35,6 +35,17 @@ uint8_t Uart2_ReceiveByte(void)
     return (uint8_t)USART2->DR;
 }
 
+uint8_t Uart2_TryReceiveByte(uint8_t *out_byte)
+{
+    if ((USART2->SR & USART_SR_RXNE) == 0U)
+    {
+        return 0U;
+    }
+
+    *out_byte = (uint8_t)USART2->DR;
+    return 1U;
+}
+
 void Uart2_SendString(const char *text)
 {
     while (*text != '\0')

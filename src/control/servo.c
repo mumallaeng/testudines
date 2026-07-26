@@ -82,11 +82,41 @@ void Servo_ApplyInitialPose(void)
     }
 }
 
+void Servo_AdjustPulse(ArmServoId servo, int16_t delta_us)
+{
+    int32_t next_pulse_us = (int32_t)g_current_pulse_us[servo] + delta_us;
+
+    if (next_pulse_us < 0)
+    {
+        next_pulse_us = 0;
+    }
+
+    g_current_pulse_us[servo] = (uint16_t)next_pulse_us;
+    ServoPwm_SetPulseUs(servo, g_current_pulse_us[servo]);
+}
+
+void Servo_ToggleGripper(void)
+{
+    uint16_t open_us = g_servo_calibration[ARM_SERVO_GRIPPER].safe_min_us;
+    uint16_t closed_us = g_servo_calibration[ARM_SERVO_GRIPPER].safe_max_us;
+    uint16_t midpoint_us = open_us + ((closed_us - open_us) / 2U);
+
+    if (g_current_pulse_us[ARM_SERVO_GRIPPER] < midpoint_us)
+    {
+        g_current_pulse_us[ARM_SERVO_GRIPPER] = closed_us;
+    }
+    else
+    {
+        g_current_pulse_us[ARM_SERVO_GRIPPER] = open_us;
+    }
+
+    ServoPwm_SetPulseUs(ARM_SERVO_GRIPPER, g_current_pulse_us[ARM_SERVO_GRIPPER]);
+}
+
 void Servo_HandleCalibrationKey(uint8_t key)
 {
     ArmServoId servo;
     int16_t delta_us;
-    int32_t next_pulse_us;
 
     switch (key)
     {
@@ -142,14 +172,7 @@ void Servo_HandleCalibrationKey(uint8_t key)
         return;
     }
 
-    next_pulse_us = (int32_t)g_current_pulse_us[servo] + delta_us;
-    if (next_pulse_us < 0)
-    {
-        next_pulse_us = 0;
-    }
-
-    g_current_pulse_us[servo] = (uint16_t)next_pulse_us;
-    ServoPwm_SetPulseUs(servo, g_current_pulse_us[servo]);
+    Servo_AdjustPulse(servo, delta_us);
 
     Uart2_SendString(kServoName[servo]);
     Uart2_SendString(": ");
