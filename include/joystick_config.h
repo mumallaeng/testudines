@@ -19,6 +19,6 @@
 
 #define JOYSTICK_ADC_CENTER 2048U    /* 12-bit ADC midpoint */
 #define JOYSTICK_DEADZONE 250U       /* ignore drift/noise around center */
-#define JOYSTICK_PULSE_STEP_US 5U    /* pulse step applied per poll tick while deflected */
+#define JOYSTICK_PULSE_STEP_US 2U    /* pulse step applied per poll tick while deflected */
 
 #endif /* JOYSTICK_CONFIG_H */

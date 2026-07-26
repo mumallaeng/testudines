@@ -25,9 +25,9 @@ typedef struct
 static const ServoCalibration g_servo_calibration[ARM_SERVO_COUNT] =
     {
         [ARM_SERVO_BASE] = {0U, SERVO_NEUTRAL_US, 0U, SERVO_NEUTRAL_US, SERVO_DIRECTION_UNVERIFIED},
-        [ARM_SERVO_SHOULDER] = {0U, SERVO_NEUTRAL_US, 0U, 660U, SERVO_DIRECTION_UNVERIFIED},
-        [ARM_SERVO_ELBOW] = {0U, SERVO_NEUTRAL_US, 0U, 900U, SERVO_DIRECTION_UNVERIFIED},
-        [ARM_SERVO_WRIST_PITCH] = {0U, SERVO_NEUTRAL_US, 0U, 1100U, SERVO_DIRECTION_UNVERIFIED},
+        [ARM_SERVO_SHOULDER] = {0U, SERVO_NEUTRAL_US, 0U, 450U, SERVO_DIRECTION_UNVERIFIED},
+        [ARM_SERVO_ELBOW] = {0U, SERVO_NEUTRAL_US, 0U, 340U, SERVO_DIRECTION_UNVERIFIED},
+        [ARM_SERVO_WRIST_PITCH] = {0U, SERVO_NEUTRAL_US, 0U, 700U, SERVO_DIRECTION_UNVERIFIED},
         [ARM_SERVO_WRIST_YAW] = {360U, SERVO_NEUTRAL_US, 2620U, 2300U, SERVO_DIRECTION_UNVERIFIED},
         [ARM_SERVO_GRIPPER] = {400U, SERVO_NEUTRAL_US, 1000U, 400U, SERVO_DIRECTION_UNVERIFIED}};
 
@@ -95,6 +95,14 @@ void Servo_AdjustPulse(ArmServoId servo, int16_t delta_us)
     ServoPwm_SetPulseUs(servo, g_current_pulse_us[servo]);
 }
 
+void Servo_EchoPulse(ArmServoId servo)
+{
+    Uart2_SendString(kServoName[servo]);
+    Uart2_SendString(": ");
+    Uart2_SendNumber(g_current_pulse_us[servo]);
+    Uart2_SendString("\r\n");
+}
+
 void Servo_ToggleGripper(void)
 {
     uint16_t open_us = g_servo_calibration[ARM_SERVO_GRIPPER].safe_min_us;
@@ -111,6 +119,7 @@ void Servo_ToggleGripper(void)
     }
 
     ServoPwm_SetPulseUs(ARM_SERVO_GRIPPER, g_current_pulse_us[ARM_SERVO_GRIPPER]);
+    Servo_EchoPulse(ARM_SERVO_GRIPPER);
 }
 
 void Servo_HandleCalibrationKey(uint8_t key)
@@ -173,9 +182,5 @@ void Servo_HandleCalibrationKey(uint8_t key)
     }
 
     Servo_AdjustPulse(servo, delta_us);
-
-    Uart2_SendString(kServoName[servo]);
-    Uart2_SendString(": ");
-    Uart2_SendNumber(g_current_pulse_us[servo]);
-    Uart2_SendString("\r\n");
+    Servo_EchoPulse(servo);
 }

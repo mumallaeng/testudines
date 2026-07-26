@@ -25,22 +25,30 @@ void Joystick_Init(void)
     g_button_change_ms = 0U;
 }
 
+static uint8_t Joystick_IsUpDownAxis(uint8_t adc_channel)
+{
+    return (adc_channel == JOYSTICK_A1_ADC_CHANNEL) ||
+           (adc_channel == JOYSTICK_A2_ADC_CHANNEL) ||
+           (adc_channel == JOYSTICK_A4_ADC_CHANNEL);
+}
+
 static int16_t Joystick_AxisDelta(uint8_t adc_channel)
 {
     uint16_t raw = Adc1_ReadChannel(adc_channel);
     int32_t offset = (int32_t)raw - (int32_t)JOYSTICK_ADC_CENTER;
+    int16_t delta_us = 0;
 
     if (offset > (int32_t)JOYSTICK_DEADZONE)
     {
-        return (int16_t)JOYSTICK_PULSE_STEP_US;
+        delta_us = (int16_t)JOYSTICK_PULSE_STEP_US;
     }
-
-    if (offset < -(int32_t)JOYSTICK_DEADZONE)
+    else if (offset < -(int32_t)JOYSTICK_DEADZONE)
     {
-        return -(int16_t)JOYSTICK_PULSE_STEP_US;
+        delta_us = -(int16_t)JOYSTICK_PULSE_STEP_US;
     }
 
-    return 0;
+    /* Up/down axes (A1, A2, A4) are mounted reversed vs. left/right. */
+    return Joystick_IsUpDownAxis(adc_channel) ? (int16_t)(-delta_us) : delta_us;
 }
 
 static void Joystick_ApplyAxis(ArmServoId servo, uint8_t adc_channel)
@@ -50,6 +58,7 @@ static void Joystick_ApplyAxis(ArmServoId servo, uint8_t adc_channel)
     if (delta_us != 0)
     {
         Servo_AdjustPulse(servo, delta_us);
+        Servo_EchoPulse(servo);
     }
 }
 
@@ -86,10 +95,10 @@ void Joystick_PollAndApply(void)
 {
     Joystick_ApplyAxis(ARM_SERVO_BASE, JOYSTICK_A0_ADC_CHANNEL);
     Joystick_ApplyAxis(ARM_SERVO_SHOULDER, JOYSTICK_A1_ADC_CHANNEL);
-    Joystick_ApplyAxis(ARM_SERVO_ELBOW, JOYSTICK_A2_ADC_CHANNEL);
-    Joystick_ApplyAxis(ARM_SERVO_GRIPPER, JOYSTICK_A3_ADC_CHANNEL);
-    Joystick_ApplyAxis(ARM_SERVO_WRIST_PITCH, JOYSTICK_A4_ADC_CHANNEL);
-    Joystick_ApplyAxis(ARM_SERVO_WRIST_YAW, JOYSTICK_A5_ADC_CHANNEL);
+    Joystick_ApplyAxis(ARM_SERVO_GRIPPER, JOYSTICK_A2_ADC_CHANNEL);
+    Joystick_ApplyAxis(ARM_SERVO_ELBOW, JOYSTICK_A3_ADC_CHANNEL);
+    Joystick_ApplyAxis(ARM_SERVO_WRIST_PITCH, JOYSTICK_A5_ADC_CHANNEL);
+    Joystick_ApplyAxis(ARM_SERVO_WRIST_YAW, JOYSTICK_A4_ADC_CHANNEL);
 
     Joystick_PollButton();
 }
